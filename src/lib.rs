@@ -170,13 +170,19 @@ impl Board {
 impl fmt::Display for Board {
 
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // Loop through board contents
+        // Draw top of board frame
+        write!(f, "+").unwrap();
+        for _ in 0..self.width {
+            write!(f, "-").unwrap();
+        }
+        write!(f, "+\n").unwrap();
+        // Draw cells
+        let x_lim = self.width - 1;
         for (i, cell) in self.cells.iter().enumerate() {
-            // New line on edges of board
-            if i == 0 {
-                continue;
-            } else if (i as i32) % self.width == 0 {
-                write!(f, "\n").unwrap();
+            let x_pos = (i as i32) % self.width;
+            // Draw leading frame edge
+            if x_pos == 0 {
+                write!(f, "|").unwrap();
             }
             // Hashtag for alive, space for dead
             match cell.state {
@@ -187,8 +193,17 @@ impl fmt::Display for Board {
                     write!(f, " ").unwrap();
                 }
             }
+            // Draw trailing frame edge
+            if x_pos == x_lim {
+                write!(f, "|\n").unwrap();
+            }
         }
-        write!(f, "")
+        // Draw bottom of board frame
+        write!(f, "+").unwrap();
+        for _ in 0..self.width {
+            write!(f, "-").unwrap();
+        }
+        write!(f, "+")
     }
 }
 
