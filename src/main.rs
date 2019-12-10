@@ -50,14 +50,54 @@ fn init_board() -> [bool; SIZE] {
     return board;
 }
 
+fn modulo(a: i32, b: i32) -> usize {
+    (((a % b) + b) % b) as usize
+}
+
+fn get_neighbour_inds(index: i32) -> [usize; 8] {
+    // this function could probably use a macro to tidy it up
+    let w = WIDTH as i32;
+    let s = SIZE as i32;
+    let nn = modulo(index - w, s);
+    let nw = modulo(index - w - 1, s);
+    let ne = modulo(index - w + 1, s);
+    let ww = modulo(index - 1, s);
+    let ee = modulo(index + 1, s);
+    let ss = modulo(index + w, s);
+    let sw = modulo(index + w - 1, s);
+    let se = modulo(index + w + 1, s);
+    return [nw, nn, ne, ww, ee, sw, ss, se];
+}
+
+fn get_live_neighbours(board: &[bool; SIZE]) -> [u8; SIZE] {
+    let mut live_neighbours = [0u8; SIZE];
+    for i in 0..SIZE {
+        let mut sum: u8 = 0;
+        let neighbour_inds = get_neighbour_inds(i as i32);
+        for j in neighbour_inds.iter() {
+            if board[*j] == ALIVE {
+                sum += 1;
+            }
+        }
+        live_neighbours[i] = sum;
+    }
+    return live_neighbours;
+}
+
 fn main() {
     let board = init_board();
-    print_board(&board);
     let mut n: u32 = 0;
     let wait_duration = time::Duration::new(REFRESH_RATE, 0);
     loop {
+        // Display
+        print_board(&board);
         n += 1;
         println!("{}", n);
+
+        // Update
+        let live_neighbours = get_live_neighbours(&board);
+
+        // Wait
         thread::sleep(wait_duration);
     }
 }
