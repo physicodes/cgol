@@ -5,3 +5,4 @@ authors = ["Joshua Read, joshua-read@hotmail.co.uk"]
 edition = "2018"
 
 [dependencies]
+rand = "0.7.2"
