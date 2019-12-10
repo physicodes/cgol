@@ -3,7 +3,7 @@ use std::{thread, time};
 
 const ALIVE: bool = true;
 const DEAD: bool = false;
-const FRAC_ALIVE: f64 = 1./10.;
+const FRAC_ALIVE: f64 = 1./4.;
 
 const WIDTH: usize = 60;
 const HEIGHT: usize = 20;
@@ -84,18 +84,41 @@ fn get_live_neighbours(board: &[bool; SIZE]) -> [u8; SIZE] {
     return live_neighbours;
 }
 
+fn update_board(board: &mut [bool; SIZE], live_neighbours: &[u8; SIZE]) {
+    for (state, neighbours) in board.iter_mut().zip(live_neighbours.iter()) {
+        if *neighbours == 3 {
+            *state = ALIVE;
+        } else if *neighbours == 2 && *state == ALIVE {
+            *state = ALIVE;
+        } else {
+            *state = DEAD;
+        }
+    }
+}
+
 fn main() {
-    let board = init_board();
+
+    // Init board
+    let mut board = init_board();
+
+    // Init loop variables
     let mut n: u32 = 0;
     let wait_duration = time::Duration::new(REFRESH_RATE, 0);
+
+    // Start loop
     loop {
-        // Display
-        print_board(&board);
+
+        // Increment counter
         n += 1;
-        println!("{}", n);
+
+        // Display
+        print!("{}[2J", 27 as char); // clear screen
+        print_board(&board);
+        println!("{}th iteration", n);
 
         // Update
         let live_neighbours = get_live_neighbours(&board);
+        update_board(&mut board, &live_neighbours);
 
         // Wait
         thread::sleep(wait_duration);
