@@ -69,8 +69,7 @@ fn get_neighbour_inds(index: i32) -> [usize; 8] {
     return [nw, nn, ne, ww, ee, sw, ss, se];
 }
 
-fn get_live_neighbours(board: &[bool; SIZE]) -> [u8; SIZE] {
-    let mut live_neighbours = [0u8; SIZE];
+fn update_neighbours(board: &[bool; SIZE], neighbours: &mut [u8; SIZE]) {
     for i in 0..SIZE {
         let mut sum: u8 = 0;
         let neighbour_inds = get_neighbour_inds(i as i32);
@@ -79,16 +78,15 @@ fn get_live_neighbours(board: &[bool; SIZE]) -> [u8; SIZE] {
                 sum += 1;
             }
         }
-        live_neighbours[i] = sum;
+        neighbours[i] = sum;
     }
-    return live_neighbours;
 }
 
-fn update_board(board: &mut [bool; SIZE], live_neighbours: &[u8; SIZE]) {
-    for (state, neighbours) in board.iter_mut().zip(live_neighbours.iter()) {
-        if *neighbours == 3 {
+fn update_board(board: &mut [bool; SIZE], neighbours: &[u8; SIZE]) {
+    for (state, nr_neighbours) in board.iter_mut().zip(neighbours.iter()) {
+        if *nr_neighbours == 3 {
             *state = ALIVE;
-        } else if *neighbours == 2 && *state == ALIVE {
+        } else if *nr_neighbours == 2 && *state == ALIVE {
             *state = ALIVE;
         } else {
             *state = DEAD;
@@ -98,8 +96,9 @@ fn update_board(board: &mut [bool; SIZE], live_neighbours: &[u8; SIZE]) {
 
 fn main() {
 
-    // Init board
+    // Init board and neighbours
     let mut board = init_board();
+    let mut neighbours = [0u8; SIZE];
 
     // Init loop variables
     let mut n: u32 = 0;
@@ -117,8 +116,8 @@ fn main() {
         println!("{}th iteration", n);
 
         // Update
-        let live_neighbours = get_live_neighbours(&board);
-        update_board(&mut board, &live_neighbours);
+        update_neighbours(&board, &mut neighbours);
+        update_board(&mut board, &neighbours);
 
         // Wait
         thread::sleep(wait_duration);
