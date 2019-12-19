@@ -2,6 +2,9 @@ from os import system
 from time import sleep
 from random import random
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 ALIVE = 1
 DEAD = 0
 
@@ -57,7 +60,7 @@ def print_board(board):
     print(''.join(output))
 
 
-def main():
+def display():
 
     board = [1 if (random() < 1/4) else 0 for _ in range(SIZE)]
 
@@ -72,6 +75,31 @@ def main():
         board = update_board(board, neighbors)
 
         sleep(1)
+
+
+def run_game(frac_alive):
+
+    board = [1 if (random() < frac_alive) else 0 for _ in range(SIZE)]
+    stuff = []
+    for n in range(11):
+        system('clear')
+        sum_ = sum(board)
+        stuff.append([n, sum_])
+        neighbors = [count_live_neighbours(i, board) for i in range(SIZE)]
+        board = update_board(board, neighbors)
+    return stuff
+
+
+def main():
+    # display()
+    fracs = [1/n for n in range(1, 11)]
+    fracs = np.arange(0, 1, 0.1)
+    results = [run_game(frac) for frac in fracs]
+    for frac, result in zip(fracs, results):
+        result = np.array(result)
+        plt.plot(result[:, 0], result[:, 1], label=str(frac))
+    plt.legend()
+    plt.show()
 
 
 if __name__ == '__main__':
