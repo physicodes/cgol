@@ -1,125 +1,194 @@
 use rand::Rng;
-use std::{thread, time};
+use std::{thread, time::Duration};
 
-const ALIVE: bool = true;
-const DEAD: bool = false;
-const FRAC_ALIVE: f64 = 1./4.;
-
-const WIDTH: usize = 60;
-const HEIGHT: usize = 20;
-const SIZE: usize = WIDTH * HEIGHT;
-
-const REFRESH_RATE: u64 = 1; // in seconds
-
-fn print_board(board: &[bool; SIZE]) {
-
-    // Initialize empty string
-    let mut output = String::from(""); 
-
-    // Loop through board contents
-    for (i, cell) in board.iter().enumerate() {
-
-        // New line on edges of board
-        if i % WIDTH == 0 {
-            output.push('\n');
-        }
-
-        // Hashtag for alive, space for dead
-        if *cell == ALIVE {
-            output.push('#');
-        } else if *cell == DEAD {
-            output.push(' ');
-        }
-    }
-
-    println!("{}", output);
+#[derive(Debug)]
+enum State {
+    Alive,
+    Dead,
 }
 
-fn init_board() -> [bool; SIZE] {
-
-    let mut board: [bool; SIZE] = [false; SIZE];
-    let mut rng = rand::thread_rng();
-
-    for cell in board.iter_mut() {
-        let random: f64 = rng.gen();
-        if random < FRAC_ALIVE {
-            *cell = true;
-        }
-    }
-
-    return board;
+#[derive(Debug)]
+struct Board {
+    width: i32,
+    height: i32,
+    cells: Vec<State>,
 }
 
-fn modulo(a: i32, b: i32) -> usize {
-    (((a % b) + b) % b) as usize
-}
+impl Board {
 
-fn get_neighbour_inds(index: i32) -> [usize; 8] {
-    // this function could probably use a macro to tidy it up
-    let w = WIDTH as i32;
-    let s = SIZE as i32;
-    let nn = modulo(index - w, s);
-    let nw = modulo(index - w - 1, s);
-    let ne = modulo(index - w + 1, s);
-    let ww = modulo(index - 1, s);
-    let ee = modulo(index + 1, s);
-    let ss = modulo(index + w, s);
-    let sw = modulo(index + w - 1, s);
-    let se = modulo(index + w + 1, s);
-    return [nw, nn, ne, ww, ee, sw, ss, se];
-}
+    fn init(width: i32, height: i32, frac_alive: f64) -> Board {
 
-fn update_neighbours(board: &[bool; SIZE], neighbours: &mut [u8; SIZE]) {
-    for i in 0..SIZE {
-        let mut sum: u8 = 0;
-        let neighbour_inds = get_neighbour_inds(i as i32);
-        for j in neighbour_inds.iter() {
-            if board[*j] == ALIVE {
-                sum += 1;
+        let mut cells = Vec::new();
+        let mut rng = rand::thread_rng();
+        for _ in 0..(width * height) {
+            let p: f64 = rng.gen();
+            if p < frac_alive {
+                cells.push(State::Alive)
+            } else {
+                cells.push(State::Dead)
             }
         }
-        neighbours[i] = sum;
+
+        Board {width: width, height: height, cells: cells}
+    }
+
+    fn print_board(&self) {
+
+        // Initialize empty string
+        let mut output = String::from(""); 
+
+        // Loop through board contents
+        for (i, cell) in self.cells.iter().enumerate() {
+
+            // New line on edges of board
+            if (i as i32) % self.width == 0 {
+                output.push('\n');
+            }
+
+            // Hashtag for alive, space for dead
+            match cell {
+                State::Alive => output.push('#'),
+                State::Dead  => output.push(' '),
+            }
+        }
+
+        // Print human readable output
+        println!("{}", output);
+    }
+
+    fn pos_from_ind(&self, index: i32) -> (i32, i32) {
+        let x = index % self.width;
+        let y = index / self.width;
+        (x, y)
+    }
+
+    fn ind_from_pos(&self, position: (i32, i32)) -> usize {
+        (self.width * position.1 + position.0) as usize
+    }
+
+    fn verify_pos(&self, position: (i32, i32)) -> (i32, i32) {
+
+        let mut x = position.0;
+        if x == -1 {
+            x = self.width - 1;
+        } else if x == self.width {
+            x = 0;
+        }
+
+        let mut y = position.1;
+        if y == -1 {
+            y = self.height - 1;
+        } else if y == self.height {
+            y = 0;
+        }
+
+        (x, y)
+    }
+
+    fn get_neighbours(&self, index: usize) -> [usize; 8] {
+        // defo wanna tidy this up with a macro
+        let (x, y) = self.pos_from_ind(index as i32);
+        [
+            self.ind_from_pos(self.verify_pos((x-1, y-1))),
+            self.ind_from_pos(self.verify_pos((x, y-1))),
+            self.ind_from_pos(self.verify_pos((x+1, y-1))),
+            self.ind_from_pos(self.verify_pos((x-1, y))),
+            self.ind_from_pos(self.verify_pos((x+1, y))),
+            self.ind_from_pos(self.verify_pos((x-1, y+1))),
+            self.ind_from_pos(self.verify_pos((x, y+1))),
+            self.ind_from_pos(self.verify_pos((x+1, y+1))),
+        ]
+
+    }
+
+    fn count_neighbours(&self, index: usize) -> i32 {
+        let neighbour_indices = self.get_neighbours(index);
+        let mut sum: i32 = 0;
+        for i in neighbour_indices.iter() {
+            match self.cells[*i] {
+                State::Alive => sum += 1,
+                State::Dead => (),
+            }
+        }
+        sum
+    }
+
+    fn update(&mut self) {
+        let mut new_cells: Vec<State> = Vec::new();
+
+        // let updated_cells: Vec<State> = Vec::new();
+        for (i, state) in self.cells.iter().enumerate() {
+            let num_neighbours = self.count_neighbours(i);
+            let new_state: State;
+
+            if num_neighbours == 3 {
+                new_state = State::Alive
+            } else if num_neighbours == 2 {
+                new_state = match state {
+                    State::Alive => State::Alive,
+                    State::Dead => State::Dead,
+                };
+            } else {
+                new_state = State::Dead;
+            }
+            new_cells.push(new_state);
+        }
+
+        self.cells = new_cells;
+    }
+
+    fn sum(&self) -> i32 {
+        let mut sum = 0i32;
+        for state in self.cells.iter() {
+            match state {
+                State::Alive => sum += 1,
+                State::Dead => (),
+            };
+        }
+        sum
+    }
+
+}
+
+fn visualise_sim(frac_alive: f64) {
+    let mut b = Board::init(50, 20, frac_alive);
+    loop {
+        print!("\x1B[2J");
+        b.print_board();
+        println!("{} cells alive.", b.sum());
+        b.update();
+        thread::sleep(Duration::from_secs(1));
     }
 }
 
-fn update_board(board: &mut [bool; SIZE], neighbours: &[u8; SIZE]) {
-    for (state, nr_neighbours) in board.iter_mut().zip(neighbours.iter()) {
-        if *nr_neighbours == 3 {
-            *state = ALIVE;
-        } else if *nr_neighbours == 2 && *state == ALIVE {
-            *state = ALIVE;
-        } else {
-            *state = DEAD;
-        }
-    }
+#[test]
+fn test_board() {
+    let mut b = Board::init(5, 5, 1.);
+    let b1 = Board::init(5, 5, 0.);
+
+    b.print_board();
+
+    let ind: usize = 13;
+    let pos = b.pos_from_ind(ind as i32);
+    assert_eq!(pos, (3, 2));
+    assert_eq!(b.ind_from_pos(pos), ind);
+    assert_eq!(b.verify_pos((-1, -1)), (4, 4));
+    assert_eq!(b.verify_pos((2, 3)), (2, 3));
+    assert_eq!(b.verify_pos((5, 5)), (0, 0));
+    assert_eq!(b.get_neighbours(4), [23, 24, 20, 3, 0, 8, 9, 5]);
+    assert_eq!(b.count_neighbours(4), 8);
+    assert_eq!(b1.count_neighbours(4), 0);
+    assert_eq!(b.sum(), 25);
+    b.update();
+    assert_eq!(b.sum(), 0);
 }
 
 fn main() {
-
-    // Init board and neighbours
-    let mut board = init_board();
-    let mut neighbours = [0u8; SIZE];
-
-    // Init loop variables
-    let mut n: u32 = 0;
-    let wait_duration = time::Duration::new(REFRESH_RATE, 0);
-
-    // Start loop
-    loop {
-
-        // Increment counter
-        n += 1;
-
-        // Display
-        print!("{}[2J", 27 as char); // clear screen
-        print_board(&board);
-        println!("{}th iteration", n);
-
-        // Update
-        update_neighbours(&board, &mut neighbours);
-        update_board(&mut board, &neighbours);
-
-        // Wait
-        thread::sleep(wait_duration);
-    }
+    let mut b = Board::init(100, 100, 0.5);
+    b.print_board();
+    println!("{}", b.sum());
+    b.update();
+    b.print_board();
+    println!("{}", b.sum());
+    visualise_sim(0.5);
 }
