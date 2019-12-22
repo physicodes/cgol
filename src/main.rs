@@ -152,6 +152,28 @@ impl Board {
 
 }
 
+#[test]
+fn test_board() {
+    let mut b = Board::init(5, 5, 1.);
+    let b1 = Board::init(5, 5, 0.);
+
+    b.print_board();
+
+    let ind: usize = 13;
+    let pos = b.pos_from_ind(ind as i32);
+    assert_eq!(pos, (3, 2));
+    assert_eq!(b.ind_from_pos(pos), ind);
+    assert_eq!(b.verify_pos((-1, -1)), (4, 4));
+    assert_eq!(b.verify_pos((2, 3)), (2, 3));
+    assert_eq!(b.verify_pos((5, 5)), (0, 0));
+    assert_eq!(b.get_neighbours(4), [23, 24, 20, 3, 0, 8, 9, 5]);
+    assert_eq!(b.count_neighbours(4), 8);
+    assert_eq!(b1.count_neighbours(4), 0);
+    assert_eq!(b.sum(), 25);
+    b.update();
+    assert_eq!(b.sum(), 0);
+}
+
 fn visualise_sim(frac_alive: f64) {
     let mut b = Board::init(50, 20, frac_alive);
     loop {
@@ -175,35 +197,13 @@ fn run_sim(frac_alive: f64, iterations: i32) -> Vec<String> {
     population
 }
 
-#[test]
-fn test_board() {
-    let mut b = Board::init(5, 5, 1.);
-    let b1 = Board::init(5, 5, 0.);
-
-    b.print_board();
-
-    let ind: usize = 13;
-    let pos = b.pos_from_ind(ind as i32);
-    assert_eq!(pos, (3, 2));
-    assert_eq!(b.ind_from_pos(pos), ind);
-    assert_eq!(b.verify_pos((-1, -1)), (4, 4));
-    assert_eq!(b.verify_pos((2, 3)), (2, 3));
-    assert_eq!(b.verify_pos((5, 5)), (0, 0));
-    assert_eq!(b.get_neighbours(4), [23, 24, 20, 3, 0, 8, 9, 5]);
-    assert_eq!(b.count_neighbours(4), 8);
-    assert_eq!(b1.count_neighbours(4), 0);
-    assert_eq!(b.sum(), 25);
-    b.update();
-    assert_eq!(b.sum(), 0);
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
     let mut wtr = Writer::from_path("out/sim_results.dat")?;
     const REPEATS: i32 = 100;
     let fracs = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
     for frac in fracs.iter() {
         for _ in 0..REPEATS {
-            let results = run_sim(*frac, 50);
+            let results = run_sim(*frac, 2000);
             wtr.write_record(results)?;
         }
     }
