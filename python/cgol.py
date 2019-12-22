@@ -5,8 +5,8 @@ from random import random
 ALIVE = 1
 DEAD = 0
 
-WIDTH = 100
-HEIGHT = 40
+WIDTH = 50
+HEIGHT = 50
 SIZE = WIDTH * HEIGHT
 
 
@@ -78,7 +78,7 @@ def run_game(frac_alive):
 
     board = [1 if (random() < frac_alive) else 0 for _ in range(SIZE)]
     stuff = []
-    for n in range(11):
+    for n in range(51):
         system('clear')
         sum_ = sum(board)
         stuff.append([n, sum_])

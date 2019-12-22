@@ -1,5 +1,7 @@
 use rand::Rng;
 use std::{thread, time::Duration};
+use std::error::Error;
+use csv::Writer;
 
 #[derive(Debug)]
 enum State {
@@ -161,6 +163,18 @@ fn visualise_sim(frac_alive: f64) {
     }
 }
 
+fn run_sim(frac_alive: f64, iterations: i32) -> Vec<String> {
+    let mut b = Board::init(100, 100, frac_alive);
+    let mut population = Vec::new();
+
+    for _ in 0..(iterations + 1) {
+        population.push(b.sum().to_string());
+        b.update();
+    }
+
+    population
+}
+
 #[test]
 fn test_board() {
     let mut b = Board::init(5, 5, 1.);
@@ -183,12 +197,16 @@ fn test_board() {
     assert_eq!(b.sum(), 0);
 }
 
-fn main() {
-    let mut b = Board::init(100, 100, 0.5);
-    b.print_board();
-    println!("{}", b.sum());
-    b.update();
-    b.print_board();
-    println!("{}", b.sum());
-    visualise_sim(0.5);
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut wtr = Writer::from_path("out/sim_results.dat")?;
+    const REPEATS: i32 = 100;
+    let fracs = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
+    for frac in fracs.iter() {
+        for _ in 0..REPEATS {
+            let results = run_sim(*frac, 50);
+            wtr.write_record(results)?;
+        }
+    }
+    wtr.flush()?;
+    Ok(())
 }
