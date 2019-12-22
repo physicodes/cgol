@@ -61,3 +61,16 @@ iteration. However, as seen below, over a large number of iterations
 these two groups converge.
 
 ![Cropped Distribution](out/cropped_results.png)
+
+## Future Work
+
+* Improve code structure and readability
+  * use macros to tidy up `vailidate_index` function
+  * seperate Board, simulation and visualisation functions
+* Write more comprehensive tests and add benchmarks
+* Introduce multithreading to improve speed of simulations
+* More analysis on results
+  * Explore what happens for starting fractions between 1/10 and 2/10
+  * Using visualisation function, try to identify a difference in
+behaviour between the two groups of starting fractions previously
+identified
