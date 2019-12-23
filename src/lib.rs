@@ -1,5 +1,4 @@
 use rand::Rng;
-use std::{thread, time::Duration};
 use std::error::Error;
 use csv::Writer;
 
@@ -152,6 +151,14 @@ impl Board {
 
 }
 
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+
 #[test]
 fn test_board() {
     let mut b = Board::init(5, 5, 1.);
@@ -174,16 +181,6 @@ fn test_board() {
     assert_eq!(b.sum(), 0);
 }
 
-fn visualise_sim(frac_alive: f64) {
-    let mut b = Board::init(50, 20, frac_alive);
-    loop {
-        print!("\x1B[2J");
-        b.print_board();
-        println!("{} cells alive.", b.sum());
-        b.update();
-        thread::sleep(Duration::from_secs(1));
-    }
-}
 
 fn run_sim(frac_alive: f64, iterations: i32) -> Vec<String> {
     let mut b = Board::init(100, 100, frac_alive);
