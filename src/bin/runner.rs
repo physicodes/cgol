@@ -20,7 +20,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let fracs = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
     for frac in fracs.iter() {
         for _ in 0..REPEATS {
-            let results = run_sim(*frac, 100);
+            let results = run_game(*frac, 100);
             wtr.write_record(results)?;
         }
     }
