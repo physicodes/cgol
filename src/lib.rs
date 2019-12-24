@@ -1,12 +1,12 @@
 use rand::Rng;
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 enum State {
     Alive,
     Dead,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Board {
     width: i32,
     height: i32,
@@ -151,9 +151,25 @@ impl Board {
 
 #[cfg(test)]
 mod tests {
+
+    use crate::{State, Board};
+
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn board_init() {
+        let b1 = Board::init(5, 5, 1.);
+        assert_eq!(b1,
+                   Board {
+                   width: 5,
+                   height: 5,
+                   cells: vec!(State::Alive; 25)}
+                   );
+        let b2 = Board::init(50, 3, 0.);
+        assert_eq!(b2,
+                   Board {
+                   width: 50,
+                   height: 3,
+                   cells: vec!(State::Dead; 150)}
+                   );
     }
 }
 
