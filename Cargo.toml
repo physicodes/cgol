@@ -3,6 +3,7 @@ name = "cgol"
 version = "0.1.0"
 authors = ["Joshua Read, joshua-read@hotmail.co.uk"]
 edition = "2018"
+default-run = "runner"
 
 [dependencies]
 rand = "0.7.2"

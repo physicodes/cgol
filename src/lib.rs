@@ -1,6 +1,4 @@
 use rand::Rng;
-use std::error::Error;
-use csv::Writer;
 
 #[derive(Debug)]
 enum State {
@@ -9,7 +7,7 @@ enum State {
 }
 
 #[derive(Debug)]
-struct Board {
+pub struct Board {
     width: i32,
     height: i32,
     cells: Vec<State>,
@@ -17,7 +15,7 @@ struct Board {
 
 impl Board {
 
-    fn init(width: i32, height: i32, frac_alive: f64) -> Board {
+    pub fn init(width: i32, height: i32, frac_alive: f64) -> Board {
 
         let mut cells = Vec::new();
         let mut rng = rand::thread_rng();
@@ -33,7 +31,7 @@ impl Board {
         Board {width: width, height: height, cells: cells}
     }
 
-    fn print_board(&self) {
+    pub fn print_board(&self) {
 
         // Initialize empty string
         let mut output = String::from(""); 
@@ -114,7 +112,7 @@ impl Board {
         sum
     }
 
-    fn update(&mut self) {
+    pub fn update(&mut self) {
         let mut new_cells: Vec<State> = Vec::new();
 
         // let updated_cells: Vec<State> = Vec::new();
@@ -138,7 +136,7 @@ impl Board {
         self.cells = new_cells;
     }
 
-    fn sum(&self) -> i32 {
+    pub fn sum(&self) -> i32 {
         let mut sum = 0i32;
         for state in self.cells.iter() {
             match state {
@@ -179,31 +177,4 @@ fn test_board() {
     assert_eq!(b.sum(), 25);
     b.update();
     assert_eq!(b.sum(), 0);
-}
-
-
-fn run_sim(frac_alive: f64, iterations: i32) -> Vec<String> {
-    let mut b = Board::init(100, 100, frac_alive);
-    let mut population = Vec::new();
-
-    for _ in 0..(iterations + 1) {
-        population.push(b.sum().to_string());
-        b.update();
-    }
-
-    population
-}
-
-fn main() -> Result<(), Box<dyn Error>> {
-    let mut wtr = Writer::from_path("out/sim_results.dat")?;
-    const REPEATS: i32 = 100;
-    let fracs = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
-    for frac in fracs.iter() {
-        for _ in 0..REPEATS {
-            let results = run_sim(*frac, 2000);
-            wtr.write_record(results)?;
-        }
-    }
-    wtr.flush()?;
-    Ok(())
 }
