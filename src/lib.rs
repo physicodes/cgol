@@ -155,7 +155,7 @@ mod tests {
     use crate::{State, Board};
 
     #[test]
-    fn board_init() {
+    fn init() {
         let b1 = Board::init(5, 5, 1.);
         assert_eq!(b1,
                    Board {
@@ -170,6 +170,12 @@ mod tests {
                    height: 3,
                    cells: vec!(State::Dead; 150)}
                    );
+    }
+
+    #[test]
+    fn print_board() {
+        let b = Board::init(5, 5, 0.5);
+        b.print_board();
     }
 }
 
