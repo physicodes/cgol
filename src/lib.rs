@@ -177,26 +177,69 @@ mod tests {
         let b = Board::init(5, 5, 0.5);
         b.print_board();
     }
-}
 
-#[test]
-fn test_board() {
-    let mut b = Board::init(5, 5, 1.);
-    let b1 = Board::init(5, 5, 0.);
+    #[test]
+    fn ind_from_pos() {
+        let b = Board::init(5, 5, 0.5);
+        let ind: i32 = 13;
+        assert_eq!(b.pos_from_ind(ind), (3, 2));
+    }
 
-    b.print_board();
+    #[test]
+    fn verify_pos() {
+        let b = Board::init(5, 5, 0.5);
+        assert_eq!(b.verify_pos((-1, -1)), (4, 4));
+        assert_eq!(b.verify_pos((2, 3)), (2, 3));
+        assert_eq!(b.verify_pos((5, 5)), (0, 0));
+    }
 
-    let ind: usize = 13;
-    let pos = b.pos_from_ind(ind as i32);
-    assert_eq!(pos, (3, 2));
-    assert_eq!(b.ind_from_pos(pos), ind);
-    assert_eq!(b.verify_pos((-1, -1)), (4, 4));
-    assert_eq!(b.verify_pos((2, 3)), (2, 3));
-    assert_eq!(b.verify_pos((5, 5)), (0, 0));
-    assert_eq!(b.get_neighbours(4), [23, 24, 20, 3, 0, 8, 9, 5]);
-    assert_eq!(b.count_neighbours(4), 8);
-    assert_eq!(b1.count_neighbours(4), 0);
-    assert_eq!(b.sum(), 25);
-    b.update();
-    assert_eq!(b.sum(), 0);
+    #[test]
+    fn get_neighbours() {
+        let b = Board::init(5, 5, 0.5);
+        assert_eq!(b.get_neighbours(4), [23, 24, 20, 3, 0, 8, 9, 5]);
+    }
+
+    #[test]
+    fn count_neighbours() {
+        let b1 = Board::init(5, 5, 1.);
+        let b2 = Board::init(5, 5, 0.);
+        assert_eq!(b1.count_neighbours(4), 8);
+        assert_eq!(b2.count_neighbours(4), 0);
+    }
+
+    #[test]
+    fn sum() {
+        let b1 = Board::init(5, 5, 0.);
+        assert_eq!(b1.sum(), 0);
+
+        let cells = vec![
+            State::Alive,
+            State::Alive,
+            State::Alive,
+            State::Alive,
+            State::Alive,
+            State::Dead,
+            State::Dead,
+            State::Dead,
+            State::Dead,
+        ];
+        let b2 = Board {
+            width: 3,
+            height: 3,
+            cells: cells,
+        };
+        assert_eq!(b2.sum(), 5);
+
+        let b3 = Board::init(5, 5, 1.);
+        assert_eq!(b3.sum(), 25);
+    }
+
+    #[test]
+    fn update() {
+        // Check an instant death situation
+        let mut b1 = Board::init(5, 5, 1.);
+        assert_eq!(b1.sum(), 25);
+        b1.update();
+        assert_eq!(b1.sum(), 0);
+    }
 }
