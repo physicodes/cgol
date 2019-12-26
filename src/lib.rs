@@ -1,4 +1,5 @@
-use rand::Rng;
+use rand::{Rng, thread_rng, seq::SliceRandom};
+use libm::round;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum State {
@@ -29,6 +30,28 @@ impl Board {
         }
 
         Board {width: width, height: height, cells: cells}
+    }
+
+    pub fn from_probability(width: i32, height: i32, frac_alive: f64) -> Board {
+        Board::init(width, height, frac_alive)
+    }
+
+    pub fn from_fraction(width: i32, height: i32, frac_alive: f64) -> Board {
+        // generate right number of states
+        let size: i32 = width * height;
+        let nr_alive: i32 = round(frac_alive * (size as f64)) as i32;
+        let nr_dead: i32 = size - nr_alive;
+        let mut cells_alive = vec![State::Alive; nr_alive as usize];
+        let cells_dead = vec![State::Dead; nr_dead as usize];
+        cells_alive.extend(cells_dead);
+
+        // shuffle states
+        let mut rng = thread_rng();
+        println!("Unshuffled: {:?}", cells_alive);
+        cells_alive.shuffle(&mut rng);
+        println!("Shuffled:   {:?}", cells_alive);
+
+        Board {width: width, height: height, cells: cells_alive}
     }
 
     pub fn print_board(&self) {
@@ -173,6 +196,14 @@ mod tests {
     }
 
     #[test]
+    fn from_fraction() {
+        let b1 = Board::from_fraction(2, 5, 0.25);
+        assert_eq!(b1.sum(), 3);
+        let b2 = Board::from_fraction(2, 5, 0.24);
+        assert_eq!(b2.sum(), 2);
+    }
+
+    #[test]
     fn print_board() {
         let b = Board::init(5, 5, 0.5);
         b.print_board();
@@ -242,4 +273,5 @@ mod tests {
         b1.update();
         assert_eq!(b1.sum(), 0);
     }
+
 }
