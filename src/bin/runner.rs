@@ -3,7 +3,7 @@ use csv::Writer;
 use cgol::Board;
 
 fn run_game(frac_alive: f64, iterations: i32) -> Vec<String> {
-    let mut b = Board::init(100, 100, frac_alive);
+    let mut b = Board::from_probability(100, 100, frac_alive);
     let mut population = Vec::new();
 
     for _ in 0..(iterations + 1) {
