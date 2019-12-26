@@ -41,17 +41,15 @@ impl Board {
         let size: i32 = width * height;
         let nr_alive: i32 = round(frac_alive * (size as f64)) as i32;
         let nr_dead: i32 = size - nr_alive;
-        let mut cells_alive = vec![State::Alive; nr_alive as usize];
-        let cells_dead = vec![State::Dead; nr_dead as usize];
-        cells_alive.extend(cells_dead);
+        let mut cells: Vec<State> = Vec::with_capacity(size as usize);
+        cells.extend(vec![State::Alive; nr_alive as usize]);
+        cells.extend(vec![State::Dead; nr_dead as usize]);
 
         // shuffle states
         let mut rng = thread_rng();
-        println!("Unshuffled: {:?}", cells_alive);
-        cells_alive.shuffle(&mut rng);
-        println!("Shuffled:   {:?}", cells_alive);
+        cells.shuffle(&mut rng);
 
-        Board {width: width, height: height, cells: cells_alive}
+        Board {width: width, height: height, cells: cells}
     }
 
     pub fn print_board(&self) {
