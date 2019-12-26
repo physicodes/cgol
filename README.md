@@ -72,7 +72,6 @@ these two groups converge.
 
 * Improve code structure and readability
   * use macros to tidy up `vailidate_index` function
-  * seperate Board, simulation and visualisation functions
 * Write more comprehensive tests and add benchmarks
 * Introduce multithreading to improve speed of simulations
 * More analysis on results
