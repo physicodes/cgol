@@ -79,7 +79,8 @@ impl Board {
     }
 
     fn ind_from_pos(&self, position: (i32, i32)) -> usize {
-        (self.width * position.1 + position.0) as usize
+        let (x, y) = self.verify_pos(position);
+        (self.width * y + x) as usize
     }
 
     fn verify_pos(&self, position: (i32, i32)) -> (i32, i32) {
@@ -102,17 +103,16 @@ impl Board {
     }
 
     fn get_neighbours(&self, index: usize) -> [usize; 8] {
-        // defo wanna tidy this up with a macro
         let (x, y) = self.pos_from_ind(index as i32);
         [
-            self.ind_from_pos(self.verify_pos((x-1, y-1))),
-            self.ind_from_pos(self.verify_pos((x, y-1))),
-            self.ind_from_pos(self.verify_pos((x+1, y-1))),
-            self.ind_from_pos(self.verify_pos((x-1, y))),
-            self.ind_from_pos(self.verify_pos((x+1, y))),
-            self.ind_from_pos(self.verify_pos((x-1, y+1))),
-            self.ind_from_pos(self.verify_pos((x, y+1))),
-            self.ind_from_pos(self.verify_pos((x+1, y+1))),
+            self.ind_from_pos((x-1, y-1)),
+            self.ind_from_pos((x, y-1)),
+            self.ind_from_pos((x+1, y-1)),
+            self.ind_from_pos((x-1, y)),
+            self.ind_from_pos((x+1, y)),
+            self.ind_from_pos((x-1, y+1)),
+            self.ind_from_pos((x, y+1)),
+            self.ind_from_pos((x+1, y+1)),
         ]
 
     }

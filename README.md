@@ -70,8 +70,6 @@ these two groups converge.
 
 ## Future Work
 
-* Improve code structure and readability
-  * use macros to tidy up `vailidate_index` function
 * Write more comprehensive tests and add benchmarks
 * Introduce multithreading to improve speed of simulations
 * More analysis on results
