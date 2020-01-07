@@ -1,6 +1,6 @@
-use std::error::Error;
-use csv::Writer;
 use cgol::Board;
+use csv::Writer;
+use std::error::Error;
 
 fn run_game(frac_alive: f64, iterations: i32) -> Vec<String> {
     let mut b = Board::from_probability(100, 100, frac_alive);

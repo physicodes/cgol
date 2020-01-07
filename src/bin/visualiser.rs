@@ -1,5 +1,5 @@
-use std::{thread, time::Duration};
 use cgol::Board;
+use std::{thread, time::Duration};
 
 fn visualise_sim(frac_alive: f64) {
     let mut b = Board::from_probability(50, 20, frac_alive);

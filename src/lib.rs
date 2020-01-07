@@ -1,5 +1,5 @@
-use rand::{Rng, thread_rng, seq::SliceRandom};
 use libm::round;
+use rand::{seq::SliceRandom, thread_rng, Rng};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum State {
@@ -15,9 +15,7 @@ pub struct Board {
 }
 
 impl Board {
-
     pub fn from_probability(width: i32, height: i32, frac_alive: f64) -> Board {
-
         let mut cells = Vec::new();
         let mut rng = rand::thread_rng();
         for _ in 0..(width * height) {
@@ -29,7 +27,11 @@ impl Board {
             }
         }
 
-        Board {width: width, height: height, cells: cells}
+        Board {
+            width: width,
+            height: height,
+            cells: cells,
+        }
     }
 
     pub fn from_fraction(width: i32, height: i32, frac_alive: f64) -> Board {
@@ -45,17 +47,19 @@ impl Board {
         let mut rng = thread_rng();
         cells.shuffle(&mut rng);
 
-        Board {width: width, height: height, cells: cells}
+        Board {
+            width: width,
+            height: height,
+            cells: cells,
+        }
     }
 
     pub fn print_board(&self) {
-
         // Initialize empty string
-        let mut output = String::from(""); 
+        let mut output = String::from("");
 
         // Loop through board contents
         for (i, cell) in self.cells.iter().enumerate() {
-
             // New line on edges of board
             if (i as i32) % self.width == 0 {
                 output.push('\n');
@@ -64,7 +68,7 @@ impl Board {
             // Hashtag for alive, space for dead
             match cell {
                 State::Alive => output.push('#'),
-                State::Dead  => output.push(' '),
+                State::Dead => output.push(' '),
             }
         }
 
@@ -84,7 +88,6 @@ impl Board {
     }
 
     fn verify_pos(&self, position: (i32, i32)) -> (i32, i32) {
-
         let mut x = position.0;
         if x == -1 {
             x = self.width - 1;
@@ -105,16 +108,15 @@ impl Board {
     fn get_neighbours(&self, index: usize) -> [usize; 8] {
         let (x, y) = self.pos_from_ind(index as i32);
         [
-            self.ind_from_pos((x-1, y-1)),
-            self.ind_from_pos((x, y-1)),
-            self.ind_from_pos((x+1, y-1)),
-            self.ind_from_pos((x-1, y)),
-            self.ind_from_pos((x+1, y)),
-            self.ind_from_pos((x-1, y+1)),
-            self.ind_from_pos((x, y+1)),
-            self.ind_from_pos((x+1, y+1)),
+            self.ind_from_pos((x - 1, y - 1)),
+            self.ind_from_pos((x, y - 1)),
+            self.ind_from_pos((x + 1, y - 1)),
+            self.ind_from_pos((x - 1, y)),
+            self.ind_from_pos((x + 1, y)),
+            self.ind_from_pos((x - 1, y + 1)),
+            self.ind_from_pos((x, y + 1)),
+            self.ind_from_pos((x + 1, y + 1)),
         ]
-
     }
 
     fn count_neighbours(&self, index: usize) -> i32 {
@@ -163,30 +165,33 @@ impl Board {
         }
         sum
     }
-
 }
 
 #[cfg(test)]
 mod tests {
 
-    use crate::{State, Board};
+    use crate::{Board, State};
 
     #[test]
     fn from_probability() {
         let b1 = Board::from_probability(5, 5, 1.);
-        assert_eq!(b1,
-                   Board {
-                   width: 5,
-                   height: 5,
-                   cells: vec!(State::Alive; 25)}
-                   );
+        assert_eq!(
+            b1,
+            Board {
+                width: 5,
+                height: 5,
+                cells: vec!(State::Alive; 25)
+            }
+        );
         let b2 = Board::from_probability(50, 3, 0.);
-        assert_eq!(b2,
-                   Board {
-                   width: 50,
-                   height: 3,
-                   cells: vec!(State::Dead; 150)}
-                   );
+        assert_eq!(
+            b2,
+            Board {
+                width: 50,
+                height: 3,
+                cells: vec!(State::Dead; 150)
+            }
+        );
     }
 
     #[test]
@@ -267,5 +272,4 @@ mod tests {
         b1.update();
         assert_eq!(b1.sum(), 0);
     }
-
 }
