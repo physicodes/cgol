@@ -1,6 +1,8 @@
 use cgol::Board;
 use csv::Writer;
 use std::error::Error;
+use std::sync::mpsc;
+use std::thread;
 
 fn run_game(frac_alive: f64, iterations: i32) -> Vec<String> {
     let mut b = Board::from_probability(100, 100, frac_alive);
@@ -19,9 +21,22 @@ fn main() -> Result<(), Box<dyn Error>> {
     const REPEATS: i32 = 100;
     let fracs = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
     for frac in fracs.iter() {
+        let (tx, rx) = mpsc::channel();
         for _ in 0..REPEATS {
-            let results = run_game(*frac, 100);
-            wtr.write_record(results)?;
+            let tx_clone = mpsc::Sender::clone(&tx);
+            let frac_clone = *frac;
+            thread::spawn(move || {
+                let results = run_game(frac_clone, 100);
+                tx_clone.send(results).unwrap();
+            });
+        }
+        let mut n_recieved = 0;
+        for result in rx {
+            n_recieved += 1;
+            wtr.write_record(result)?;
+            if n_recieved == REPEATS {
+                break;
+            }
         }
     }
     wtr.flush()?;
