@@ -19,6 +19,7 @@ fn run_game(frac_alive: f64, iterations: i32) -> Vec<String> {
 fn main() -> Result<(), Box<dyn Error>> {
     let mut wtr = Writer::from_path("out/sim_results.dat")?;
     const REPEATS: i32 = 100;
+    const ITERATIONS: i32 = 2000;
     let fracs = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
     for frac in fracs.iter() {
         let (tx, rx) = mpsc::channel();
@@ -26,7 +27,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let tx_clone = mpsc::Sender::clone(&tx);
             let frac_clone = *frac;
             thread::spawn(move || {
-                let results = run_game(frac_clone, 2000);
+                let results = run_game(frac_clone, ITERATIONS);
                 tx_clone.send(results).unwrap();
             });
         }
