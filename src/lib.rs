@@ -1,5 +1,6 @@
 use libm::round;
 use rand::{seq::SliceRandom, thread_rng, Rng};
+use std::fmt;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum State {
@@ -52,28 +53,6 @@ impl Board {
             height: height,
             cells: cells,
         }
-    }
-
-    pub fn print_board(&self) {
-        // Initialize empty string
-        let mut output = String::from("");
-
-        // Loop through board contents
-        for (i, cell) in self.cells.iter().enumerate() {
-            // New line on edges of board
-            if (i as i32) % self.width == 0 {
-                output.push('\n');
-            }
-
-            // Hashtag for alive, space for dead
-            match cell {
-                State::Alive => output.push('#'),
-                State::Dead => output.push(' '),
-            }
-        }
-
-        // Print human readable output
-        println!("{}", output);
     }
 
     fn pos_from_ind(&self, index: i32) -> (i32, i32) {
@@ -164,6 +143,30 @@ impl Board {
             };
         }
         sum
+    }
+}
+
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // Loop through board contents
+        for (i, cell) in self.cells.iter().enumerate() {
+            // New line on edges of board
+            if i == 0 {
+                continue;
+            } else if (i as i32) % self.width == 0 {
+                write!(f, "\n").unwrap();
+            }
+            // Hashtag for alive, space for dead
+            match cell {
+                State::Alive => {
+                    write!(f, "#").unwrap();
+                },
+                State::Dead => {
+                    write!(f, " ").unwrap();
+                }
+            }
+        }
+        write!(f, "")
     }
 }
 
