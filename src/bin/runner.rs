@@ -26,7 +26,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let tx_clone = mpsc::Sender::clone(&tx);
             let frac_clone = *frac;
             thread::spawn(move || {
-                let results = run_game(frac_clone, 100);
+                let results = run_game(frac_clone, 2000);
                 tx_clone.send(results).unwrap();
             });
         }
