@@ -66,7 +66,7 @@ members of these groups seem to depend on the population after the first
 iteration. However, as seen below, over a large number of iterations
 these two groups converge.
 
-![Cropped Distribution](out/cropped_results.png)
+![Full Distribution](out/full_results.png)
 
 ## Future Work
 
