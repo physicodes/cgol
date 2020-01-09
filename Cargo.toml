@@ -3,9 +3,9 @@ name = "cgol"
 version = "0.1.0"
 authors = ["Joshua Read, joshua-read@hotmail.co.uk"]
 edition = "2018"
-default-run = "runner"
+default-run = "visualiser"
 
 [dependencies]
 rand = "0.7.2"
-csv = "1.1"
 libm = "0.2.1"
+clap = "2.33.0"

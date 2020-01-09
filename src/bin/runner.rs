@@ -1,45 +1,51 @@
 use cgol::Board;
-use csv::Writer;
-use std::error::Error;
 use std::sync::mpsc;
 use std::thread;
 
-fn run_game(frac_alive: f64, iterations: i32) -> Vec<String> {
-    let mut b = Board::from_probability(100, 100, frac_alive);
-    let mut population = Vec::new();
+// Board constants
+const WIDTH: i32 = 100;
+const HEIGHT: i32 = 100;
 
-    for _ in 0..(iterations + 1) {
-        population.push(b.sum().to_string());
-        b.update();
-    }
+// Game constants
+const ITERATIONS: u32 = 2000;
+const REPEATS: u32 = 100;
 
-    population
-}
+// Frac lists
+const FULL_RANGE: [f64; 9] = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+const STRANGE_RANGE: [f64; 6] = [0.10, 0.12, 0.14, 0.16, 0.18, 0.20];
 
-fn main() -> Result<(), Box<dyn Error>> {
-    let mut wtr = Writer::from_path("out/sim_results.dat")?;
-    const REPEATS: i32 = 100;
-    const ITERATIONS: i32 = 2000;
-    let fracs = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
-    for frac in fracs.iter() {
+fn threaded_runner(frac: f64) {
         let (tx, rx) = mpsc::channel();
         for _ in 0..REPEATS {
             let tx_clone = mpsc::Sender::clone(&tx);
-            let frac_clone = *frac;
+            let frac_clone = frac;
             thread::spawn(move || {
-                let results = run_game(frac_clone, ITERATIONS);
+                let mut board = Board::from_probability(WIDTH, HEIGHT, frac_clone);
+                let results = board.run(ITERATIONS);
                 tx_clone.send(results).unwrap();
             });
         }
         let mut n_recieved = 0;
         for result in rx {
             n_recieved += 1;
-            wtr.write_record(result)?;
             if n_recieved == REPEATS {
                 break;
             }
         }
+}
+
+fn main() {
+
+    println!("Starting with full range of starting fracs...");
+    for frac in FULL_RANGE.iter() {
+        threaded_runner(*frac);
     }
-    wtr.flush()?;
-    Ok(())
+    println!("...Done");
+
+    println!("Running with starting frac between 0.1 and 0.2...");
+    for frac in STRANGE_RANGE.iter() {
+        threaded_runner(*frac);
+    }
+    println!("...Done");
+
 }

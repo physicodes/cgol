@@ -134,6 +134,17 @@ impl Board {
         self.cells = new_cells;
     }
 
+    pub fn run(&mut self, iterations: u32) -> Vec<String> {
+        let mut sum_list = Vec::new();
+
+        for _ in 0..(iterations + 1) {
+            sum_list.push(self.sum().to_string());
+            self.update();
+        }
+
+        sum_list
+    }
+
     pub fn sum(&self) -> i32 {
         let mut sum = 0i32;
         for state in self.cells.iter() {
@@ -147,6 +158,7 @@ impl Board {
 }
 
 impl fmt::Display for Board {
+
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Loop through board contents
         for (i, cell) in self.cells.iter().enumerate() {
@@ -208,7 +220,7 @@ mod tests {
     #[test]
     fn print_board() {
         let b = Board::from_probability(5, 5, 0.5);
-        b.print_board();
+        println!("{}", b);
     }
 
     #[test]
