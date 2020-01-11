@@ -16,6 +16,7 @@ pub struct Board {
 }
 
 impl Board {
+
     pub fn from_probability(width: i32, height: i32, frac_alive: f64) -> Board {
         let mut cells = Vec::new();
         let mut rng = rand::thread_rng();

@@ -7,7 +7,7 @@ const WIDTH: i32 = 100;
 const HEIGHT: i32 = 100;
 
 // Game constants
-const ITERATIONS: u32 = 2000;
+const ITERATIONS: u32 = 200;
 const REPEATS: u32 = 100;
 
 // Frac lists
