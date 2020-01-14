@@ -88,25 +88,32 @@ impl Board {
         }
     }
 
-//    pub fn from_fraction(width: i32, height: i32, frac_alive: f64) -> Board {
-//        // generate right number of states
-//        let size: i32 = width * height;
-//        let nr_alive: i32 = round(frac_alive * (size as f64)) as i32;
-//        let nr_dead: i32 = size - nr_alive;
-//        let mut cells: Vec<State> = Vec::with_capacity(size as usize);
-//        cells.extend(vec![State::Alive; nr_alive as usize]);
-//        cells.extend(vec![State::Dead; nr_dead as usize]);
-//
-//        // shuffle states
-//        let mut rng = thread_rng();
-//        cells.shuffle(&mut rng);
-//
-//        Board {
-//            width: width,
-//            height: height,
-//            cells: cells,
-//        }
-//    }
+    pub fn from_fraction(width: i32, height: i32, frac_alive: f64) -> Board {
+        // generate right number of states
+        let size: i32 = width * height;
+        let nr_alive: i32 = round(frac_alive * (size as f64)) as i32;
+        let nr_dead: i32 = size - nr_alive;
+        let mut states: Vec<State> = Vec::with_capacity(size as usize);
+        states.extend(vec![State::Alive; nr_alive as usize]);
+        states.extend(vec![State::Dead; nr_dead as usize]);
+
+        // shuffle states
+        let mut rng = thread_rng();
+        states.shuffle(&mut rng);
+
+        // convert cells to states
+        let mut cells: Vec<Cell> = Vec::with_capacity(size as usize);
+        for (index, state) in states.iter().enumerate() {
+            let neighbours = board_indices::get_neighbours(index as i32, width, height);
+            cells.push(Cell { state: *state, neighbours: neighbours } );
+        }
+
+        Board {
+            width: width,
+            height: height,
+            cells: cells,
+        }
+    }
 
     pub fn update(&mut self) {
         // start vector of new states
