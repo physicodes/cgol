@@ -3,12 +3,12 @@ use rand::{seq::SliceRandom, thread_rng, Rng};
 use std::fmt;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub enum State {
+enum State {
     Alive,
     Dead,
 }
 
-pub struct Cell {
+struct Cell {
     state: State,
     neighbours: [usize; 8],
 }
@@ -21,7 +21,7 @@ pub struct Board {
 
 mod board_indices {
 
-    fn pos_from_ind(index: i32, width: i32, height: i32) -> (i32, i32) {
+    fn pos_from_ind(index: i32, width: i32) -> (i32, i32) {
         let x = index % width;
         let y = index / width;
         (x, y)
@@ -51,7 +51,7 @@ mod board_indices {
     }
 
     pub fn get_neighbours(index: i32, width: i32, height: i32) -> [usize; 8] {
-        let (x, y) = pos_from_ind(index, width, height);
+        let (x, y) = pos_from_ind(index, width);
         [
             ind_from_pos((x - 1, y - 1), width, height),
             ind_from_pos((x, y - 1), width, height),
