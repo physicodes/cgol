@@ -3,11 +3,12 @@ use rand::{seq::SliceRandom, thread_rng, Rng};
 use std::fmt;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-enum State {
+pub enum State {
     Alive,
     Dead,
 }
 
+#[derive(Clone)]
 struct Cell {
     state: State,
     neighbours: [usize; 8],
@@ -66,6 +67,23 @@ mod board_indices {
 }
 
 impl Board {
+
+    pub fn from_states(width: u32, height: u32, states: Vec<State>) -> Board {
+        if (width * height) != states.len() as u32 {
+            panic!("Board dimensions do not match number of states supplied");
+        }
+        let mut cells = Vec::new();
+        for (index, &state) in states.iter().enumerate() {
+            let neighbours = board_indices::get_neighbours(index as i32, width as i32, height as i32);
+            cells.push(Cell { state: state, neighbours: neighbours });
+        }
+        
+        Board {
+            width: width as i32,
+            height: height as i32,
+            cells: cells,
+        }
+    }
 
     pub fn from_probability(width: i32, height: i32, frac_alive: f64) -> Board {
         let mut cells = Vec::new();
@@ -207,11 +225,42 @@ impl fmt::Display for Board {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-// 
-//     use crate::{Board, State};
-// 
+#[cfg(test)]
+mod tests {
+
+    use crate::{board_indices, Board, State};
+
+    #[test]
+    fn from_states() {
+        // Init parameters
+        let width = 3;
+        let height = 3;
+        let states = vec![
+            State::Alive,
+            State::Dead,
+            State::Alive,
+            State::Dead,
+            State::Alive,
+            State::Dead,
+            State::Alive,
+            State::Dead,
+            State::Alive,
+        ];
+        // Generate board
+        let board = Board::from_states(3, 3, states.clone());
+        // Check board parameters
+        assert_eq!(board.width, width);
+        assert_eq!(board.height, height);
+        // Check cell parameters
+        for i in 0..states.len() {
+            assert_eq!(board.cells[i].state, states[i]);
+            let neighbours = board_indices::get_neighbours(i as i32, width, height);
+            assert_eq!(board.cells[i].neighbours, neighbours);
+        }
+    }
+
+}
+
 //     #[test]
 //     fn from_probability() {
 //         let b1 = Board::from_probability(5, 5, 1.);
@@ -234,13 +283,13 @@ impl fmt::Display for Board {
 //         );
 //     }
 // 
-// //    #[test]
-// //    fn from_fraction() {
-// //        let b1 = Board::from_fraction(2, 5, 0.25);
-// //        assert_eq!(b1.sum(), 3);
-// //        let b2 = Board::from_fraction(2, 5, 0.24);
-// //        assert_eq!(b2.sum(), 2);
-// //    }
+//     #[test]
+//     fn from_fraction() {
+//         let b1 = Board::from_fraction(2, 5, 0.25);
+//         assert_eq!(b1.sum(), 3);
+//         let b2 = Board::from_fraction(2, 5, 0.24);
+//         assert_eq!(b2.sum(), 2);
+//     }
 // 
 //     #[test]
 //     fn print_board() {
