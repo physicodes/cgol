@@ -8,14 +8,11 @@ const WIDTH: i32 = 100;
 const HEIGHT: i32 = 100;
 
 // Game constants
-const ITERATIONS: u32 = 200;
-const REPEATS: u32 = 100;
-
-// Frac lists
-const FULL_RANGE: [f64; 9] = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
-const STRANGE_RANGE: [f64; 6] = [0.10, 0.12, 0.14, 0.16, 0.18, 0.20];
+const ITERATIONS: u32 = 2000;
+const REPEATS: u32 = 10;
 
 fn threaded_runner(frac: f64) {
+    println!("Starting {}", frac);
     let mut wtr = Writer::from_path(format!("analysis/data/{}.csv", frac))
         .unwrap();
 
@@ -44,15 +41,10 @@ fn threaded_runner(frac: f64) {
 
 fn main() {
 
-    println!("Starting with full range of starting fracs...");
-    for frac in FULL_RANGE.iter() {
-        threaded_runner(*frac);
-    }
-    println!("...Done");
-
-    println!("Running with starting frac between 0.1 and 0.2...");
-    for frac in STRANGE_RANGE.iter() {
-        threaded_runner(*frac);
+    println!("Starting...");
+    for i in 1..50 {
+        let frac = i as f64 / 50.0;
+        threaded_runner(frac);
     }
     println!("...Done");
 
