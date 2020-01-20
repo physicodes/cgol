@@ -141,11 +141,12 @@ impl Board {
         //     sum cells
             let mut sum = 0;
             for neighbour_ind in cell.neighbours.iter() {
-                let neighbour_state = self.cells[*neighbour_ind].state;
-                match neighbour_state {
-                    State::Alive => sum += 1,
-                    State::Dead => sum += 0,
-                };
+                if let Some(neighbour) = self.cells.get(*neighbour_ind) {
+                    match neighbour.state {
+                        State::Alive => sum += 1,
+                        State::Dead => sum += 0,
+                    };
+                }
             }
             neighbour_count.push(sum);
         }
