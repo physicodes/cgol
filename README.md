@@ -44,7 +44,7 @@ The main result for me was successfully building this project in Rust,
 with a goal of learning the language. However I couldn't help thinking
 a little about the results of the simulation.
 
-![Cropped Distribution](out/cropped_results.png)
+![Cropped Distribution](analysis/cropped_results.png)
 
 The above image shows the first 100 iterations of the simulation. It can
 be seen that for higher starting fractions, the population drops greatly
@@ -66,7 +66,7 @@ members of these groups seem to depend on the population after the first
 iteration. However, as seen below, over a large number of iterations
 these two groups converge.
 
-![Full Distribution](out/full_results.png)
+![Full Distribution](analysis/full_results.png)
 
 ## Future Work
 
