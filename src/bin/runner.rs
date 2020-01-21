@@ -8,8 +8,9 @@ const WIDTH: i32 = 100;
 const HEIGHT: i32 = 100;
 
 // Game constants
-const ITERATIONS: u32 = 2000;
-const REPEATS: u32 = 10;
+const ITERATIONS_MED: u32 = 5000;
+const ITERATIONS_HIGH: u32 = 20000;
+const REPEATS: u32 = 100;
 
 fn threaded_runner(frac: f64) {
     println!("Starting {}", frac);
@@ -22,7 +23,11 @@ fn threaded_runner(frac: f64) {
         let frac_clone = frac;
         thread::spawn(move || {
             let mut board = Board::from_probability(WIDTH, HEIGHT, frac_clone);
-            let results = board.run(ITERATIONS);
+            let results = if (frac < 0.13) & (frac > 0.05) {
+                board.run(ITERATIONS_HIGH)
+            } else {
+                board.run(ITERATIONS_MED)
+            };
             tx_clone.send(results).unwrap();
         });
     }
