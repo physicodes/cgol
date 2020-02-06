@@ -1,6 +1,5 @@
 use cgol::Board;
-use std::sync::mpsc;
-use std::thread;
+use std::{fs, thread, path::Path, sync::mpsc};
 use csv::Writer;
 
 // Board constants
@@ -12,9 +11,12 @@ const ITERATIONS_MED: u32 = 5000;
 const ITERATIONS_HIGH: u32 = 20000;
 const REPEATS: u32 = 100;
 
+// Folder to write data
+const DATA_DIR: &str = "analysis/data";
+
 fn threaded_runner(frac: f64) {
     println!("Starting {}", frac);
-    let mut wtr = Writer::from_path(format!("analysis/data/{}.csv", frac))
+    let mut wtr = Writer::from_path(format!("{}/{}.csv", DATA_DIR, frac))
         .unwrap();
 
     let (tx, rx) = mpsc::channel();
@@ -45,6 +47,10 @@ fn threaded_runner(frac: f64) {
 }
 
 fn main() {
+
+    if !Path::new(DATA_DIR).exists() {
+        fs::create_dir(DATA_DIR).unwrap();
+    }
 
     println!("Starting...");
     for i in 1..50 {
