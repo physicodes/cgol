@@ -11,7 +11,7 @@ def load_files(dir_path):
     information."""
 
     df_cols = ["frac", "repeat", "iteration", "nr_alive"]
-    df = pd.DataFrame(columns=df_cols)
+    df = pd.DataFrame(columns=df_cols, dtype=int)
 
     data_file_paths = list(dir_path.iterdir())[:2]
     nr_files = len(data_file_paths)
@@ -40,7 +40,9 @@ def load_files(dir_path):
 def main():
     path_to_data = Path(DATA_DIR)
     df_full = load_files(path_to_data)
-    print(df_full)
+    df_grouped = \
+        df_full.groupby(['frac', 'iteration'])['nr_alive'].agg(['mean', 'std'])
+    df_grouped.to_pickle(path_to_data / "data.pickle")
 
 
 if __name__ == '__main__':

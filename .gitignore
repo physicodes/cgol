@@ -1,5 +1,5 @@
 /target
 **/*.rs.bk
-analysis/data
+analysis/data/**.csv
 analysis/venv
 analysis/__pycache__
