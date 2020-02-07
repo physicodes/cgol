@@ -70,9 +70,6 @@ these two groups converge.
 
 ## Future Work
 
-* Write more comprehensive tests and add benchmarks
-* More analysis on results
-  * Explore what happens for starting fractions between 1/10 and 2/10
-  * Using visualisation function, try to identify a difference in
-behaviour between the two groups of starting fractions previously
-identified
+* Replace graphs with interactive bokeh plots
+* Write tests
+* Pass data via reference from child to main thread
