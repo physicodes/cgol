@@ -3,3 +3,4 @@
 analysis/data/**.csv
 analysis/venv
 analysis/__pycache__
+**.html
