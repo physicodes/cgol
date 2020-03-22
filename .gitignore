@@ -1,5 +1,5 @@
 /target
 **/*.rs.bk
-analysis/data/**.csv
-analysis/venv
-analysis/__pycache__
+**.html
+.ipynb_checkpoints
+/data

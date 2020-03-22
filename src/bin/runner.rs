@@ -12,7 +12,7 @@ const ITERATIONS_HIGH: u32 = 20000;
 const REPEATS: u32 = 100;
 
 // Folder to write data
-const DATA_DIR: &str = "analysis/data";
+const DATA_DIR: &str = "data";
 
 fn threaded_runner(frac: f64) {
     println!("Starting {}", frac);
